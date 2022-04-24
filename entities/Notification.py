@@ -1,10 +1,13 @@
+import json
+
+
 class Notification:
     """ NOTIFICATION_CHANNEL , SMS,EMAIL,PUSH etc"""
-    NOTIFICATION_CHANNEL = ""
-    NOTIFICATION_TEMPLATE = ""
-    NOTIFICATION_SUBJECT = ""
-    NOTIFICATION_BODY = ""
-    NOTIFICATION_RECIPIENTS = ""
+    # NOTIFICATION_CHANNEL = ""
+    # NOTIFICATION_TEMPLATE = ""
+    # NOTIFICATION_SUBJECT = ""
+    # NOTIFICATION_BODY = ""
+    # NOTIFICATION_RECIPIENTS = ""
 
 
 
@@ -40,3 +43,10 @@ class Notification:
 
     def get_notification_recipients(self):
         return self.NOTIFICATION_RECIPIENTS
+
+    def __str__(self) -> str:
+        return "{0}".format(self.NOTIFICATION_CHANNEL)
+
+    def toJSON(self):
+        return json.dumps(self,default=lambda o: o.__dict__)
+

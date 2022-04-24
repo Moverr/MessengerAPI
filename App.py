@@ -1,4 +1,5 @@
-from flask import Flask, render_template
+from flask import Flask, jsonify, render_template
+import jsons
  
 
 from services.MessengerService import MessengerService
@@ -25,7 +26,7 @@ def send():
 
 @app.route("/receive",methods=['POST'])
 def receive():
-    messenger.receiveMessage
-    return  "Received"
+    return jsonify({'data':messenger.receiveMessage()})
+    
 
 # api.add_resource(home(),)
