@@ -49,6 +49,6 @@ class MessengerService:
         # self.DATARECEIEVD.append(xt)
         return self.DATARECEIEVD
 
-    def callback(self,ch, method, properties, body):
+    def callback(self, ch, method, properties, body):
         self.DATARECEIEVD.append(body)
         print(" [x] Received %r" % body)
