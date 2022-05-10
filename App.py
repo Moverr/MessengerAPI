@@ -1,11 +1,14 @@
+import json
 from flask import Flask, jsonify, render_template
 import jsons
- 
+
+import pika
+from entities.Notification import Notification
+
 
 from services.MessengerService import MessengerService
 
-messenger  = MessengerService() 
- 
+
 app = Flask(__name__)
 app.debug = True
 app.secret_key = 'development key'
@@ -13,20 +16,25 @@ app.secret_key = 'development key'
 if __name__ == "__main__":
     app.run(debug=True)
 
-@app.route("/",methods=['GET'])
+
+@app.route("/", methods=['GET'])
 def home():
-    return  render_template('welcome.html')
+    return render_template('welcome.html')
 
-@app.route("/send",methods=['POST'])
+
+@app.route("/send", methods=['POST'])
 def send():
-    messenger.sendMessage
-    print("lsoooelose")
-    return   "Send"
+
+    messenger = MessengerService()
+    messenger.sendMessage()
+
+    return "sent message"
 
 
-@app.route("/receive",methods=['POST'])
+@app.route("/receive", methods=['POST'])
 def receive():
-    return jsonify({'data':messenger.receiveMessage()})
-    
+    messenger = MessengerService()
+    st  = messenger.receiveMessage()
+    return jsonify({'data': st})
 
-# api.add_resource(home(),)
+ 

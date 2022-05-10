@@ -1,5 +1,4 @@
 
-#!/usr/bin/env python
 from asyncio.windows_events import NULL
 from hashlib import new
 import json
@@ -11,36 +10,31 @@ from entities.Notification import Notification
 
 class MessengerService:
     RABBITMQ_URL = 'localhost'
-    RABBITMQ_QUEUE = 'v2.messenger'
+    RABBITMQ_QUEUE = 'v1.messenger'
 
     DATARECEIEVD = []
 
     def __init__(self):
-        self.initilize()
-        # xt =  Notification()
-        # xt.set_notification_channel("EMAIL")
-        # xt.set__notification_body("TEST")
-        # xt.set_notificatiton_subect("TEST")
-        # xt.set_notification_template("template")
-        # # # //this willbe interpreted
-        # # # by the service intended,which is the channel determines which service
-        # xt.set_notification_recipients("recipient,recipient2,recipient")
-
-        # # notificationJSONData = json.dumps(xt.toJSON(),indent=4)
-        # self.DATARECEIEVD.append(xt.toJSON())
+        pass
 
     def initilize(self):
-        self.rabbitMqConnection = pika.BlockingConnection(
-            pika.ConnectionParameters(self.RABBITMQ_URL))
-        self.channel = self.rabbitMqConnection.channel()
-        self.channel.queue_declare(queue=self.RABBITMQ_QUEUE)
+        connection = pika.BlockingConnection(
+            pika.ConnectionParameters(host='localhost'))
+        channel = connection.channel()
+        channel.queue_declare(queue=self.RABBITMQ_QUEUE)
 
-        self.start_consuming()
-        self.channel.basic_consume(
-            queue=self.RABBITMQ_QUEUE, on_message_callback=self.callback, auto_ack=True)
+        def callback(ch, method, properties, body):
+            print(" [x] Received %r" % body)
+            self.DATARECEIEVD.append(body)
+        channel.basic_consume(queue=self.RABBITMQ_QUEUE,
+                              on_message_callback=callback, auto_ack=True)
+
+        print(' [*] Waiting for messages. To exit press CTRL+C')
+        channel.start_consuming()
 
     def start_consuming(self):
-        self.channel.start_consuming()
+        self.channel.basic_consume(
+            queue=self.RABBITMQ_QUEUE, on_message_callback=self.callback, auto_ack=True)
 
     def sendMessage(self):
 
@@ -54,20 +48,18 @@ class MessengerService:
         xt.set_notification_recipients("recipient,recipient2,recipient")
 
         jsonStr = json.dumps(xt.toJSON())
-        self.channel.basic_publish(exchange='',
-                                   routing_key=self.RABBITMQ_QUEUE,
-                                   body=jsonStr)
-        self.rabbitMqConnection.close()
 
-        return "sent message"
+        connection = pika.BlockingConnection(
+            pika.ConnectionParameters(host='localhost'))
+        channel = connection.channel()
+
+        channel.queue_declare(queue=self.RABBITMQ_QUEUE)
+
+        channel.basic_publish(
+            exchange='', routing_key=self.RABBITMQ_QUEUE, body=jsonStr)
+        print(" [x] Sent 'Hello World!'")
+        connection.close()
 
     def receiveMessage(self):
-
-        # self.DATARECEIEVD.append(xt)
-        # str = json.dumps(self.DATARECEIEVD.isoformat())
-        # ''.join([str(item) for item in self.DATARECEIEVD])
+        self.initilize()
         return self.DATARECEIEVD
-
-    def callback(self, ch, method, properties, body):
-        self.DATARECEIEVD.append(body)
-        print(" [x] Received %r" % body)
